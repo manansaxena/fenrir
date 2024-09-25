@@ -1,6 +1,9 @@
 #ifndef FENRIR_H
 #define FENRIR_H
 
+/*
+    This is the main class where log probability of the model is calculated.
+*/
 class FENRIR
 {
 public:
@@ -32,7 +35,7 @@ public:
     int F_len, G_len, W_len, gamma_len;
 
     FENRIR(
-        Eigen::MatrixXd Y_obs, Eigen::VectorXd observed_TT, Eigen::VectorXd N_total_list, int N_total, int N_obs,Eigen::MatrixXd F, std::vector<Eigen::MatrixXd> G,Eigen::VectorXd gamma, std::vector<Eigen::MatrixXd> W, std::vector<Eigen::MatrixXd> M0, std::vector<Eigen::MatrixXd> C0, Eigen::MatrixXd Xi0, double v0)
+        Eigen::MatrixXd Y_obs, Eigen::VectorXd observed_TT, Eigen::VectorXd N_total_list, int N_total, int N_obs, Eigen::MatrixXd F, std::vector<Eigen::MatrixXd> G, Eigen::VectorXd gamma, std::vector<Eigen::MatrixXd> W, std::vector<Eigen::MatrixXd> M0, std::vector<Eigen::MatrixXd> C0, Eigen::MatrixXd Xi0, double v0)
     {
         this->Y_obs = Y_obs;
         this->N_total = observed_TT.size();
@@ -68,7 +71,6 @@ public:
         this->q = Eigen::VectorXd::Zero(this->N_obs);
         this->e = Eigen::MatrixXd::Zero(this->P, this->N_obs);
         this->S = Eigen::MatrixXd::Zero(this->Q, this->N_obs);
-
     }
 
     Eigen::MatrixXd calculate_gradient(Eigen::MatrixXd eta)
@@ -76,18 +78,18 @@ public:
         Eigen::VectorXd S = Eigen::VectorXd::Zero(this->N_obs);
         int pos = 0;
         for (int i = 0; i < this->N_total; i++)
-        {   
+        {
             if (this->observed_TT(i) == 1)
-            {   
+            {
                 S[pos] = 1 + 1 / this->v[i] * ((eta.col(pos) - this->f.col(pos)).transpose() * invertMatrix(this->q[pos] * this->Xi[i]) * (eta.col(pos) - this->f.col(pos)))(0, 0);
                 pos += 1;
             }
-            else {
+            else
+            {
                 continue;
             }
         }
         Eigen::MatrixXd grad_sum = Eigen::MatrixXd::Zero(this->P, this->N_obs);
-        
         pos = 0;
         for (int i = 0; i < this->N_total; i++)
         {
@@ -96,7 +98,8 @@ public:
                 grad_sum.col(pos) = -1 * (this->v[i] + this->P) / 2 * 1 / S[pos] * 2 / this->v[i] * (eta.col(pos).transpose() - this->f.col(pos).transpose()) * invertMatrix(this->q[pos] * this->Xi[i]);
                 pos += 1;
             }
-            else {
+            else
+            {
                 continue;
             }
         }
@@ -114,25 +117,27 @@ public:
         Eigen::MatrixXd W_t(this->Q, this->Q);
         double gamma_t;
 
-        for(int timeseries=0;timeseries<this->num_timeseries;timeseries++){
-            this->M[t+timeseries] = this->M0[timeseries];
-            this->C[t+timeseries] = this->C0[timeseries];
-            for(int i=0;i<this->N_total_list[timeseries];i++){
+        for (int timeseries = 0; timeseries < this->num_timeseries; timeseries++)
+        {
+            this->M[t + timeseries] = this->M0[timeseries];
+            this->C[t + timeseries] = this->C0[timeseries];
+            for (int i = 0; i < this->N_total_list[timeseries]; i++)
+            {
                 F_t = this->F.col(t);
                 G_t = this->G[t];
                 W_t = this->W[t];
                 gamma_t = this->gamma[t];
-                this->A[t] = G_t * this->M[t+timeseries];
-                this->R[t] = G_t * this->C[t+timeseries] * G_t.transpose() + W_t;
+                this->A[t] = G_t * this->M[t + timeseries];
+                this->R[t] = G_t * this->C[t + timeseries] * G_t.transpose() + W_t;
 
-                if(this->observed_TT(t) == 1){
+                if (this->observed_TT(t) == 1)
+                {
                     this->f.col(pos) = this->A[t].transpose() * F_t;
                     this->q[pos] = F_t.transpose() * this->R[t] * F_t + gamma_t;
                     log_prob_eta_accum = log_prob_eta_accum + mult_t_log_pdf(eta.col(pos),
-                                                         this->v[t],
-                                                         this->f.col(pos),
-                                                         //  to_symmetric_matrix(this->q[t] * multiply_lower_tri_self_transpose(this->Xi[0])));
-                                                         (this->q[pos] * this->Xi[t]) / this->v[t]);
+                                                                             this->v[t],
+                                                                             this->f.col(pos),
+                                                                             (this->q[pos] * this->Xi[t]) / this->v[t]);
                     this->S.col(pos) = this->R[t] * F_t / this->q[pos];
                     this->e.col(pos) = eta.col(pos) - this->f.col(pos);
                     this->M[t + timeseries + 1] = this->A[t] + this->S.col(pos) * this->e.col(pos).transpose();
@@ -140,7 +145,9 @@ public:
                     this->v[t + 1] = this->v[t] + 1;
                     this->Xi[t + 1] = this->Xi[t] + (this->e.col(pos) * this->e.col(pos).transpose()) / this->q[pos];
                     pos += 1;
-                }else{
+                }
+                else
+                {
                     this->M[t + timeseries + 1] = this->A[t];
                     this->C[t + timeseries + 1] = this->R[t];
                     this->v[t + 1] = this->v[t];
@@ -151,14 +158,16 @@ public:
         }
         return log_prob_eta_accum;
     }
-
 };
 
+/*
+    Function for the smoother
+*/
 std::vector<std::vector<Eigen::MatrixXd>> fenrir_smoother(const Eigen::MatrixXd &eta,
-                                            Eigen::MatrixXd F, std::vector<Eigen::MatrixXd> G, Eigen::VectorXd gamma, std::vector<Eigen::MatrixXd> W,
-                                            std::vector<Eigen::MatrixXd> M0, std::vector<Eigen::MatrixXd> C0, Eigen::MatrixXd Xi0, 
-                                            double v0, Eigen::VectorXd observed_TT,
-                                            Eigen::VectorXd N_total_list, int seed)
+                                                          Eigen::MatrixXd F, std::vector<Eigen::MatrixXd> G, Eigen::VectorXd gamma, std::vector<Eigen::MatrixXd> W,
+                                                          std::vector<Eigen::MatrixXd> M0, std::vector<Eigen::MatrixXd> C0, Eigen::MatrixXd Xi0,
+                                                          double v0, Eigen::VectorXd observed_TT,
+                                                          Eigen::VectorXd N_total_list, int seed)
 {
     int TT = observed_TT.size();
     int p = eta.rows();
@@ -168,14 +177,14 @@ std::vector<std::vector<Eigen::MatrixXd>> fenrir_smoother(const Eigen::MatrixXd 
     Eigen::VectorXd F_t(q);
     Eigen::MatrixXd G_t(q, q);
     Eigen::MatrixXd W_t(q, q);
-    Eigen::VectorXd f;
+    Eigen::VectorXd f(p);
     double qq;
-    Eigen::VectorXd S;
-    Eigen::VectorXd e;
+    Eigen::VectorXd S(q);
+    Eigen::VectorXd e(p);
     double gamma_t;
     std::vector<Eigen::MatrixXd> Xi(TT + 1, Eigen::MatrixXd(p, p));
     std::vector<double> v(TT + 1, 0.0);
-    
+
     std::vector<Eigen::MatrixXd> M(TT + num_timeseries, Eigen::MatrixXd(q, p));
     std::vector<Eigen::MatrixXd> C(TT + num_timeseries, Eigen::MatrixXd(q, q));
     std::vector<Eigen::MatrixXd> A(TT, Eigen::MatrixXd(q, p));
@@ -187,18 +196,20 @@ std::vector<std::vector<Eigen::MatrixXd>> fenrir_smoother(const Eigen::MatrixXd 
     Xi[0] = Xi0;
     v[0] = v0;
 
-    for(int timeseries=0;timeseries<num_timeseries;timeseries++){
-        M[t+timeseries] = M0[timeseries];
-        C[t+timeseries] = C0[timeseries];
-        for(int i=0;i<N_total_list[timeseries];i++){
+    for (int timeseries = 0; timeseries < num_timeseries; timeseries++)
+    {
+        M[t + timeseries] = M0[timeseries];
+        C[t + timeseries] = C0[timeseries];
+        for (int i = 0; i < N_total_list[timeseries]; i++)
+        {
             F_t = F.col(t);
             G_t = G[t];
             W_t = W[t];
             gamma_t = gamma[t];
-            A[t] = G_t * M[t+timeseries];
-            R[t] = G_t * C[t+timeseries] * G_t.transpose() + W_t;
-
-            if(observed_TT(t) == 1){
+            A[t] = G_t * M[t + timeseries];
+            R[t] = G_t * C[t + timeseries] * G_t.transpose() + W_t;
+            if (observed_TT(t) == 1)
+            {
                 f = A[t].transpose() * F_t;
                 qq = F_t.transpose() * R[t] * F_t + gamma_t;
                 S = R[t] * F_t / qq;
@@ -209,7 +220,8 @@ std::vector<std::vector<Eigen::MatrixXd>> fenrir_smoother(const Eigen::MatrixXd 
                 Xi[t + 1] = Xi[t] + (e * e.transpose()) / qq;
                 pos += 1;
             }
-            else {
+            else
+            {
                 M[t + timeseries + 1] = A[t];
                 C[t + timeseries + 1] = R[t];
                 v[t + 1] = v[t];
@@ -218,35 +230,40 @@ std::vector<std::vector<Eigen::MatrixXd>> fenrir_smoother(const Eigen::MatrixXd 
             t = t + 1;
         }
     }
-    
+
     Xi[TT] = (Xi[TT] + Xi[TT].transpose()) / 2.0;
 
     boost::random::mt19937 rng(seed);
     Eigen::MatrixXd Sigma = inv_wishart_rng(v[TT], Xi[TT], rng);
     Sigma = (Sigma + Sigma.transpose()) / 2.0;
-    
+
     t = -1;
     int reset_flag = 1;
-    Eigen::MatrixXd Z;
+    Eigen::MatrixXd Z(q, q);
 
     std::vector<Eigen::MatrixXd> theta0(num_timeseries, Eigen::MatrixXd(q, p));
 
-    for(int timeseries=num_timeseries-1;timeseries>=0;timeseries--){
+    for (int timeseries = num_timeseries - 1; timeseries >= 0; timeseries--)
+    {
         reset_flag = 1;
-        for(int i=0;i<N_total_list[timeseries];++i){
-            if(reset_flag == 1){
+        for (int i = 0; i < N_total_list[timeseries]; ++i)
+        {
+            if (reset_flag == 1)
+            {
                 C[TT + timeseries - t - 1] = (C[TT + timeseries - t - 1] + C[TT + timeseries - t - 1].transpose()) / 2.0;
                 theta[TT - t - 2] = matrix_normal_rng(M[TT + timeseries - t - 1], C[TT + timeseries - t - 1], Sigma, rng);
                 reset_flag = 0;
             }
-            else{ 
+            else
+            {
                 G_t = G[TT - t - 1];
                 Z = C[TT + timeseries - t - 1] * G_t.transpose() * (R[TT - t - 1]).inverse();
                 C[TT + timeseries - t - 1] = C[TT + timeseries - t - 1] - Z * R[TT - t - 1] * Z.transpose();
                 C[TT + timeseries - t - 1] = (C[TT + timeseries - t - 1] + C[TT + timeseries - t - 1].transpose()) / 2.0;
                 M[TT + timeseries - t - 1] = M[TT + timeseries - t - 1] + Z * (theta[TT - t - 1] - A[TT - t - 1]);
                 theta[TT - t - 2] = matrix_normal_rng(M[TT + timeseries - t - 1], C[TT + timeseries - t - 1], Sigma, rng);
-                if(i == N_total_list[timeseries]-1){
+                if (i == N_total_list[timeseries] - 1)
+                {
                     G_t = G[TT - t - 2];
                     Z = C[TT + timeseries - t - 2] * G_t.transpose() * (R[TT - t - 2]).inverse();
                     C[TT + timeseries - t - 2] = C[TT + timeseries - t - 2] - Z * R[TT - t - 2] * Z.transpose();
@@ -255,7 +272,7 @@ std::vector<std::vector<Eigen::MatrixXd>> fenrir_smoother(const Eigen::MatrixXd 
                     theta0[timeseries] = matrix_normal_rng(M[TT + timeseries - t - 2], C[TT + timeseries - t - 2], Sigma, rng);
                 }
             }
-            t = t+1;
+            t = t + 1;
         }
     }
 

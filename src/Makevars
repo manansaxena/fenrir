@@ -1,1 +1,1 @@
-PKG_CPPFLAGS+=-I/home/ayden/Documents/libs/boost_1_82_0
+PKG_CPPFLAGS+=-I<path to boost library stored>

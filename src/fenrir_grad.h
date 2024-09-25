@@ -1,6 +1,11 @@
 #ifndef FENRIR_GRAD
 #define FENRIR_GRAD
 
+/*
+Defines the functions that combine the log probability and gradients of the model calculated using Fenrir class.
+Also, passed onto the LBFGS optimizer.
+*/
+
 class FenrirGrad : public Numer::MFuncGrad
 {
 private:
@@ -28,14 +33,13 @@ private:
     double v0;
 
 public:
-    FenrirGrad(Eigen::MatrixXd Y_obs_, Eigen::VectorXd observed_TT_, Eigen::VectorXd N_total_list_, int N_total_, int N_obs_, Eigen::MatrixXd F_, std::vector<Eigen::MatrixXd> G_, Eigen::VectorXd gamma_, std::vector<Eigen::MatrixXd> W_, std::vector<Eigen::MatrixXd> M0_, std::vector<Eigen::MatrixXd> C0_, Eigen::MatrixXd Xi0_, 
-             double v0_, std::string log_prob_filename_):
-             Y_obs(Y_obs_), observed_TT(observed_TT_), N_total_list(N_total_list_), N_total(N_total_), N_obs(N_obs_), F(F_), G(G_), gamma(gamma_), W(W_), M0(M0_), C0(C0_), Xi0(Xi0_), v0(v0_), saver(log_prob_filename_)
+    FenrirGrad(Eigen::MatrixXd Y_obs_, Eigen::VectorXd observed_TT_, Eigen::VectorXd N_total_list_, int N_total_, int N_obs_, Eigen::MatrixXd F_, std::vector<Eigen::MatrixXd> G_, Eigen::VectorXd gamma_, std::vector<Eigen::MatrixXd> W_, std::vector<Eigen::MatrixXd> M0_, std::vector<Eigen::MatrixXd> C0_, Eigen::MatrixXd Xi0_,
+               double v0_, std::string log_prob_filename_) : Y_obs(Y_obs_), observed_TT(observed_TT_), N_total_list(N_total_list_), N_total(N_total_), N_obs(N_obs_), F(F_), G(G_), gamma(gamma_), W(W_), M0(M0_), C0(C0_), Xi0(Xi0_), v0(v0_), saver(log_prob_filename_)
     {
         n = Y_obs.colwise().sum();
         P = Y_obs.rows() - 1;
     }
-    
+
     ~FenrirGrad() {}
 
     double calc_eta_ll(const Eigen::Ref<const Eigen::VectorXd> &etavec, FENRIR &fenrir)
@@ -78,7 +82,7 @@ public:
     }
 
     double f_grad(Numer::Constvec &etavec, Numer::Refvec grad)
-    {   
+    {
         FENRIR fenrir(Y_obs, observed_TT, N_total_list, N_total, N_obs, F, G, gamma, W, M0, C0, Xi0, v0);
         double log_prob = calc_ll(etavec, fenrir);
         grad = -calc_grad(etavec, fenrir);

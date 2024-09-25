@@ -39,36 +39,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// fenrir_mh
-Rcpp::List fenrir_mh(Eigen::MatrixXd Y_obs, Eigen::VectorXd observed_TT, Eigen::VectorXd N_total_list, int N_obs, Eigen::MatrixXd F, Rcpp::List G, Eigen::VectorXd gamma, Rcpp::List W, Rcpp::List M0, Rcpp::List C0, Eigen::MatrixXd Xi0, double v0, Eigen::MatrixXd initial_states, int run_mcmc, int num_chains, int num_steps, int seed, int n_cores, double scale_factor_of_proposal, Rcpp::Nullable<Eigen::MatrixXd> cholesky);
-RcppExport SEXP _fenrir_fenrir_mh(SEXP Y_obsSEXP, SEXP observed_TTSEXP, SEXP N_total_listSEXP, SEXP N_obsSEXP, SEXP FSEXP, SEXP GSEXP, SEXP gammaSEXP, SEXP WSEXP, SEXP M0SEXP, SEXP C0SEXP, SEXP Xi0SEXP, SEXP v0SEXP, SEXP initial_statesSEXP, SEXP run_mcmcSEXP, SEXP num_chainsSEXP, SEXP num_stepsSEXP, SEXP seedSEXP, SEXP n_coresSEXP, SEXP scale_factor_of_proposalSEXP, SEXP choleskySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type Y_obs(Y_obsSEXP);
-    Rcpp::traits::input_parameter< Eigen::VectorXd >::type observed_TT(observed_TTSEXP);
-    Rcpp::traits::input_parameter< Eigen::VectorXd >::type N_total_list(N_total_listSEXP);
-    Rcpp::traits::input_parameter< int >::type N_obs(N_obsSEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type F(FSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type G(GSEXP);
-    Rcpp::traits::input_parameter< Eigen::VectorXd >::type gamma(gammaSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type W(WSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type M0(M0SEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type C0(C0SEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type Xi0(Xi0SEXP);
-    Rcpp::traits::input_parameter< double >::type v0(v0SEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type initial_states(initial_statesSEXP);
-    Rcpp::traits::input_parameter< int >::type run_mcmc(run_mcmcSEXP);
-    Rcpp::traits::input_parameter< int >::type num_chains(num_chainsSEXP);
-    Rcpp::traits::input_parameter< int >::type num_steps(num_stepsSEXP);
-    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
-    Rcpp::traits::input_parameter< int >::type n_cores(n_coresSEXP);
-    Rcpp::traits::input_parameter< double >::type scale_factor_of_proposal(scale_factor_of_proposalSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Eigen::MatrixXd> >::type cholesky(choleskySEXP);
-    rcpp_result_gen = Rcpp::wrap(fenrir_mh(Y_obs, observed_TT, N_total_list, N_obs, F, G, gamma, W, M0, C0, Xi0, v0, initial_states, run_mcmc, num_chains, num_steps, seed, n_cores, scale_factor_of_proposal, cholesky));
-    return rcpp_result_gen;
-END_RCPP
-}
 // fenrir_smooth
 Rcpp::List fenrir_smooth(Eigen::MatrixXd eta, Eigen::MatrixXd F, Rcpp::List G, Eigen::VectorXd gamma, Rcpp::List W, Rcpp::List M0, Rcpp::List C0, Eigen::MatrixXd Xi0, double v0, Eigen::VectorXd observed_TT, Eigen::VectorXd N_total_list, int seed);
 RcppExport SEXP _fenrir_fenrir_smooth(SEXP etaSEXP, SEXP FSEXP, SEXP GSEXP, SEXP gammaSEXP, SEXP WSEXP, SEXP M0SEXP, SEXP C0SEXP, SEXP Xi0SEXP, SEXP v0SEXP, SEXP observed_TTSEXP, SEXP N_total_listSEXP, SEXP seedSEXP) {
@@ -94,7 +64,6 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_fenrir_fenrir_optim", (DL_FUNC) &_fenrir_fenrir_optim, 18},
-    {"_fenrir_fenrir_mh", (DL_FUNC) &_fenrir_fenrir_mh, 20},
     {"_fenrir_fenrir_smooth", (DL_FUNC) &_fenrir_fenrir_smooth, 12},
     {NULL, NULL, 0}
 };

@@ -5,10 +5,6 @@ fenrir_optim <- function(Y_obs, observed_TT, N_total_list, F, G, gamma, W, M0, C
     .Call(`_fenrir_fenrir_optim`, Y_obs, observed_TT, N_total_list, F, G, gamma, W, M0, C0, Xi0, v0, init, log_probs_path, num_dirsamples, pseudocount, eps_f, eps_g, max_iter)
 }
 
-fenrir_mh <- function(Y_obs, observed_TT, N_total_list, N_obs, F, G, gamma, W, M0, C0, Xi0, v0, initial_states, run_mcmc = 1L, num_chains = 2L, num_steps = 1000L, seed = 1L, n_cores = 1L, scale_factor_of_proposal = 1, cholesky = NULL) {
-    .Call(`_fenrir_fenrir_mh`, Y_obs, observed_TT, N_total_list, N_obs, F, G, gamma, W, M0, C0, Xi0, v0, initial_states, run_mcmc, num_chains, num_steps, seed, n_cores, scale_factor_of_proposal, cholesky)
-}
-
 fenrir_smooth <- function(eta, F, G, gamma, W, M0, C0, Xi0, v0, observed_TT, N_total_list, seed) {
     .Call(`_fenrir_fenrir_smooth`, eta, F, G, gamma, W, M0, C0, Xi0, v0, observed_TT, N_total_list, seed)
 }
