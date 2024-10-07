@@ -1,4 +1,5 @@
-# fenrir
+<img src="fenrir_logo.png" alt="Fenrir Logo" style="width:150px;height:150px;">
+
 Package for Scalable Inference for Bayesian Multinomial Logistic-Normal Dynamic Linear Models
 
 ## Fenrir Package Requirements
