@@ -7,7 +7,6 @@ Package for Scalable Inference for Bayesian Multinomial Logistic-Normal Dynamic 
 Ensure these packages are installed from CRAN:
 
 - **Rcpp**: version 1.0.10 or higher
-- **Rcpp**
 - **RcppEigen**
 - **RcppDist**
 - **RcppNumerical**
